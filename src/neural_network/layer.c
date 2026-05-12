@@ -11,9 +11,7 @@ struct layer *create_layer(const int prev_layer_size, const int layer_size)
     struct layer *res = malloc(sizeof(struct layer));
 
     if (res == NULL)
-    {
-        errx(EXIT_FAILURE, "malloc failed");
-    }
+        errx(EXIT_FAILURE, "layer.c -> create_layer() : malloc failed");
 
     res->prev_layer = NULL;
 
@@ -26,26 +24,17 @@ struct layer *create_layer(const int prev_layer_size, const int layer_size)
     res->inputs = malloc(sizeof(long double *));
 
     res->weights = malloc(layer_size * sizeof(long double *));
-
-    for (int i = 0; i < layer_size; i++)
-    {
-        if (isnanf(res->outputs[i]))
-        {
-            errx(EXIT_FAILURE, "layer->outputs is nan");
-        }
-        res->weights[i] = malloc(prev_layer_size * sizeof(long double));
-        for (int j = 0; j < prev_layer_size; j++)
-        {
-            res->weights[i][j] =
-                (long double)rand() / (long double)RAND_MAX * 2 - 1;
-        }
-    }
-
     res->biases = malloc(layer_size * sizeof(long double));
 
     for (int i = 0; i < layer_size; i++)
     {
         res->biases[i] = (long double)rand() / (long double)RAND_MAX * 2 - 1;
+
+        res->weights[i] = malloc(prev_layer_size * sizeof(long double));
+        for (int j = 0; j < prev_layer_size; j++)
+        {
+            res->weights[i][j] = (long double)rand() / (long double)RAND_MAX * 2 - 1;
+        }
     }
 
     return res;
@@ -54,29 +43,21 @@ struct layer *create_layer(const int prev_layer_size, const int layer_size)
 void link_layers(struct layer **back_layer, struct layer **front_layer)
 {
     if ((*back_layer)->layer_size != (*front_layer)->prev_layer_size)
-    {
-        errx(EXIT_FAILURE,
-             "Trying to link two incompatible layers ! back_layer->layer_size "
-             "!= front_layer->prev_layer_size");
-    }
+        errx(EXIT_FAILURE, "Trying to link two incompatible layers ! back_layer->layer_size (%d) != front_layer->prev_layer_size (%d).", (*back_layer)->layer_size, (*front_layer)->prev_layer_size );
+
+
     free((*front_layer)->prev_layer);
     (*front_layer)->prev_layer = *back_layer;
     *(*front_layer)->inputs = (*back_layer)->outputs;
 }
 
-void link_layer_output(struct layer *layer,
-                       const struct neural_network *neural_network)
+void link_layer_output(struct layer *layer, const struct neural_network *neural_network)
 {
     if (neural_network->output_size != layer->layer_size)
-    {
         errx(EXIT_FAILURE, "layer not the same size as the outputs");
-    }
 
     if (layer->outputs != NULL)
-    {
-
         free(layer->outputs);
-    }
 
     *neural_network->outputs = layer->outputs;
     layer->is_output_layer = true;
