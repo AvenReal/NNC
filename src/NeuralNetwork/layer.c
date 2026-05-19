@@ -1,10 +1,7 @@
-//
-// Created by Evan on 30/09/2025.
+
 #include "layer.h"
-#include <err.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "ActivationFunctions.h"
+#include "MainHeader.h"
 
 struct layer *create_layer(const int prev_layer_size, const int layer_size)
 {
@@ -74,50 +71,7 @@ void link_layer_input(struct layer *layer, int input_size, long double **inputs)
     layer->inputs = inputs;
 }
 
-/**
- * Activation function used inside the neural network
- * @param layer The layer.
- */
-void ReLU_activation_function(const struct layer *layer)
-{
-    for (int i = 0; i < layer->layer_size; i++)
-    {
-        layer->outputs[i] = layer->outputs[i] > 0 ? layer->outputs[i] : 0;
-    }
-}
 
-/**
- * Activation function used for the last layer (output) of the neural network
- * @param layer The layer
- */
-void soft_max_activation_function(const struct layer *layer)
-{
-    long double sum = 0;
-    long double max = layer->outputs[0];
-    for (int i = 1; i < layer->layer_size; i++)
-    {
-        if (layer->outputs[i] > max)
-        {
-            max = layer->outputs[i];
-        }
-    }
-
-    for (int i = 0; i < layer->layer_size; i++)
-    {
-        layer->outputs[i] = exp(layer->outputs[i] - max);
-        sum += layer->outputs[i];
-    }
-    for (int i = 0; i < layer->layer_size; i++)
-    {
-        layer->outputs[i] = layer->outputs[i] / sum;
-        if (isnanf(layer->outputs[i]))
-        {
-            errx(EXIT_FAILURE,
-                 "output is nan | layer->outputs[i] / sum : %Lg / %Lg",
-                 layer->outputs[i], sum);
-        }
-    }
-}
 
 void layer_calculate_output(const struct layer *layer)
 {
@@ -153,11 +107,11 @@ void layer_calculate_output(const struct layer *layer)
     }
     if (layer->is_output_layer)
     {
-        soft_max_activation_function(layer);
+        SoftMax_ActivationFunction(layer);
     }
     else
     {
-        ReLU_activation_function(layer);
+        ReLU_ActivationFunction(layer);
     }
 }
 

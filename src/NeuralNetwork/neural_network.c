@@ -123,21 +123,21 @@ void minimise_loss(const struct neural_network *neural_network,
                 long double current_loss =
                     categorical_cross_entropy(neural_network, expected_output);
                 // printf("Current loss:     %Lg, %Lg\n", current_loss,
-                // (*neural_network->outputs)[0]);
+                // (*NeuralNetwork->outputs)[0]);
 
                 layer->weights[j][k] += shift;
                 neural_network_calculate_output(neural_network);
                 long double plus_shift_loss =
                     categorical_cross_entropy(neural_network, expected_output);
                 // printf("Plus shift loss:  %Lg, %Lg\n", plus_shift_loss,
-                // (*neural_network->outputs)[1]);
+                // (*NeuralNetwork->outputs)[1]);
 
                 layer->weights[j][k] -= shift * 2;
                 neural_network_calculate_output(neural_network);
                 long double minus_shift_loss =
                     categorical_cross_entropy(neural_network, expected_output);
                 // printf("Minus shift loss: %Lg, %Lg\n", minus_shift_loss,
-                // (*neural_network->outputs)[expected_output - 'A']);
+                // (*NeuralNetwork->outputs)[expected_output - 'A']);
 
                 if (plus_shift_loss < current_loss &&
                     plus_shift_loss < minus_shift_loss)
@@ -156,13 +156,13 @@ void minimise_loss(const struct neural_network *neural_network,
                     errx(EXIT_FAILURE, "Loss is nan");
                 }
 
-                // if (current_loss != categorical_cross_entropy(neural_network,
+                // if (current_loss != categorical_cross_entropy(NeuralNetwork,
                 // expected_output)) {
                 //      printf("Loss: %Lg -> %Lg\n", current_loss,
-                //      categorical_cross_entropy(neural_network,
+                //      categorical_cross_entropy(NeuralNetwork,
                 //      expected_output)); printf("Excepted: %c, Got: %c\n",
                 //      expected_output,
-                //      get_neural_network_output(neural_network));
+                //      get_neural_network_output(NeuralNetwork));
                 // }
             }
             long double original_bias = layer->biases[j];
